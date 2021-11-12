@@ -126,7 +126,16 @@ public class Slice {
      * @param rng a random number generator
      * @return the chosen slice
      */
-    public Slice getRandomSlice(int rng) {
+    public Slice getRandomSlice(Random rng) {
+        int r = rng.nextInt(totalFollow);
+        int sum = 0;
+
+        for (Map.Entry<Slice, Integer> e : followTimes.entrySet()) {
+            sum += e.getValue();
+            if (r < sum) {
+                return e.getKey();
+            }
+        }
         return null;
     }
 
