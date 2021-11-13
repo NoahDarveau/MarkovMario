@@ -5,112 +5,54 @@ import java.util.Map;
 import java.util.Random;
 
 public class Slice {
-
-    // total number of followups
+    // Keeping track of "following" slices.
     private int totalFollow;
+    private final Map<Slice, Integer> followTimes;
 
-    // the blocks in this slice. pieces[0] is the top of the screen, pieces[15] is the bottom
-    private char[] pieces;
-
-    // a map that keeps track of each slice that can follow this one and the number of times that it did
-    private Map<Slice, Integer> followTimes;
-
-    // whether this slice contains a flag character
+    // Keeping track of specific aspects of slices (pieces, the flag, and the start).
+    private final char[] pieces;
     private boolean isFlag;
-
-    // whether this slice contains a Mario start character
     private boolean isMario;
 
-    /**
-     *  Basic constructor
-     */
+    // Basic constructor for a slice.
     public Slice() {
         pieces = new char[16];
         totalFollow = 0;
-        followTimes = new HashMap<Slice, Integer>();
+        followTimes = new HashMap<>();
         isFlag = false;
         isMario = false;
     }
 
+    // Getters and setters.
+    public void setFlag(boolean newFlag) {
+        this.isFlag = newFlag;
+    }
+    public boolean getFlag() {
+        return this.isFlag;
+    }
+    public void setMario(boolean newMario) {
+        this.isMario = newMario;
+    }
+    public boolean getMario() {
+        return this.isMario;
+    }
+    public char getChar(int index) { return this.pieces[index]; }
+    public int getNextSlices() {
+        return totalFollow;
+    }
 
-    /**
-     * @return a string representing the blocks in this slice
-     */
+    // Converts a piece to its string counterpart.
     public String toString() {
         return String.valueOf(pieces);
     }
 
-
-    /**
-     * Replaces the character at the index slice with the given character
-     * @param newChar the character to add
-     * @param index the index to replace with the input character
-     */
-    public void replaceCharacter(char newChar, int index) {
+    // Replace the value at a given slice with another char.
+    public void replaceChar(char newChar, int index) {
         this.pieces[index] = newChar;
     }
 
-
-    /**
-     * Specify whether this slice contains a flag ('F')
-     * @param newFlag the new isFlag value
-     */
-    public void setFlag(boolean newFlag) {
-        this.isFlag = newFlag;
-    }
-
-
-    /**
-     * Returns whether this slice contains a flag ('F')
-     * @return the value of isFlag
-     */
-    public boolean getFlag() {
-        return this.isFlag;
-    }
-
-
-    /**
-     * Specify whether this slice contains a Mario start location ('M')
-     * @param newMario the new isMario value
-     */
-    public void setMario(boolean newMario) {
-        this.isMario = newMario;
-    }
-
-
-    /**
-     * Returns whether this slice contains a Mario start ('M')
-     * @return the value of isMario
-     */
-    public boolean getMario() {
-        return this.isMario;
-    }
-
-
-    /**
-     * Get the character at the specified index in this slice
-     * @param index the index of the piece you want
-     * @return the char in that index
-     */
-    public char getChar(int index) {
-        return this.pieces[index];
-    }
-
-
-    /**
-     * totalFollow getter
-     * @return the total number of followups to this slice
-     */
-    public int getTotalFollow() {
-        return totalFollow;
-    }
-
-
-    /**
-     * Add a followup slice to this one
-     * @param slice the slice that follows this one
-     */
-    public void addFollowupSlice(Slice slice) {
+    // Adds the "following" slice to the current slice.
+    public void addNextSlice(Slice slice) {
         if (followTimes.containsKey(slice)) {
             followTimes.put(slice, followTimes.get(slice) + 1);
         } else {
@@ -119,14 +61,8 @@ public class Slice {
         totalFollow++;
     }
 
-
-
-    /**
-     * Picks a random slice from its followups based on Markov Chain rules
-     * @param rng a random number generator
-     * @return the chosen slice
-     */
-    public Slice getRandomSlice(Random rng) {
+    // Gets a random slice using the Markov Chain.
+    public Slice getMarkovSlice(Random rng) {
         int r = rng.nextInt(totalFollow);
         int sum = 0;
 
@@ -137,39 +73,5 @@ public class Slice {
             }
         }
         return null;
-    }
-
-
-    /**
-     * Checks whether a given block is solid
-     * @param c the character to check
-     * @return true if the character represents a solid block, false otherwise
-     */
-    public boolean isSolid(char c) {
-        return  c == 'X' || c == '#' || c == '@' || c == '!' || c == 'B' || c == 'C' ||
-                c == 'Q' || c == '<' || c == '>' || c == '[' || c == ']' || c == '?' ||
-                c == 'S' || c == 'U' || c == 'D' || c == '%' || c == 't' || c == 'T';
-    }
-
-
-    /**
-     * Finds the height of the lowest solid ground Mario can stand on
-     * @return the height of the ground, starting from 0
-     */
-    public int getGroundHeight() {
-        int ret = -1;
-
-        for (int i = 15; i >= 0; i--) {
-            if (isSolid(getChar(i))) {
-                ret = i;
-            }
-            else {
-                if (ret > -1) {
-                    return ret;
-                }
-            }
-        }
-
-        return -1; //Getting here means we never found a solid block with air above it
     }
 }
