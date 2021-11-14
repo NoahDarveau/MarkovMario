@@ -27,22 +27,22 @@ public class LevelGenerator implements MarioLevelGenerator {
         // Get all level files in the specified directory.
         for (final File file: Objects.requireNonNull(new File(LEVELS).listFiles())) {
             if (!file.isDirectory()) {
-                parseIn(file.getAbsolutePath());
+                parse(file.getAbsolutePath());
             }
         }
     }
 
     // Reads a single file and splits it into slices that are added to the transition table.
-    private void parseIn(String filename) {
+    private void parse(String filename) {
         System.out.println("Reading " + filename);
         FileReader reader;
-        List<char[]> columns = new ArrayList<char[]>();
+        List<char[]> columns = new ArrayList<>();
         try {
-            reader = new FileReader(filename);
             int i;
             int column = 0;
             int row = 0;
             boolean firstColumn = true;
+            reader = new FileReader(filename);
 
             // Separate each column into arrays of chars.
             while ((i = reader.read()) != -1) {
