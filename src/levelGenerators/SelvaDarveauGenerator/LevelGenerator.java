@@ -46,19 +46,22 @@ public class LevelGenerator implements MarioLevelGenerator {
 
             // Separate each column into arrays of chars.
             while ((i = reader.read()) != -1) {
-                if ((char) i == '\n') {
-                    if (firstColumn) {
-                        firstColumn = false;
-                    }
-                    row++;
-                    column = 0;
-                } else {
-                    if (firstColumn) {
-                        columns.add(new char[16]);
-                    }
+                if ((char) i != '\r' && (char) i != '\u0000') {
+                    if ((char) i == '\n') {
+                        if (firstColumn) {
+                            firstColumn = false;
+                        }
+                        row++;
+                        column = 0;
+                    } else {
+                        if (firstColumn) {
+                            columns.add(new char[16]);
+                        }
 
-                    columns.get(column)[row] = (char) i;
-                    column++;
+
+                        columns.get(column)[row] = (char) i;
+                        column++;
+                    }
                 }
             }
             reader.close();
@@ -123,7 +126,13 @@ public class LevelGenerator implements MarioLevelGenerator {
         // Add slices until the end is reached.
         while (x < model.getWidth() - 1) {
             do {
-                currentSlice = currentSlice.getMarkovSlice(rand);
+                if (currentSlice.getNextSlices() >= 1) {
+                    currentSlice = currentSlice.getMarkovSlice(rand);
+                }
+                else {
+                    atEnd = true;
+                    break;
+                }
             } while (currentSlice.getNextSlices() < 1);
 
             addSlice(model, x, currentSlice);
