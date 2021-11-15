@@ -113,24 +113,22 @@ public class LevelGenerator implements MarioLevelGenerator {
     public String getGeneratedLevel(MarioLevelModel model, MarioTimer timer) {
         Random rand = new Random();
         model.clearMap();
-        Slice currentSlice;
+        int x = 1;
+        boolean atEnd = false;
 
         // Adds the starting slice.
-        currentSlice = slices.get(starts.get(rand.nextInt(starts.size())));
+        Slice currentSlice = slices.get(starts.get(rand.nextInt(starts.size())));
         addSlice(model, 0, currentSlice);
 
         // Add slices until the end is reached.
-        int x = 1;
-        boolean atEnd = false;
         while (x < model.getWidth() - 1) {
             do {
-                assert currentSlice != null;
                 currentSlice = currentSlice.getMarkovSlice(rand);
-            } while (currentSlice != null && currentSlice.getNextSlices() < 1);
+            } while (currentSlice.getNextSlices() < 1);
 
             addSlice(model, x, currentSlice);
 
-            if (currentSlice != null && currentSlice.getFlag()) {
+            if (currentSlice.getFlag()) {
                 atEnd = true;
                 break;
             }

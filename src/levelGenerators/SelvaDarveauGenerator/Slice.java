@@ -63,15 +63,13 @@ public class Slice {
 
     // Gets a random slice using the Markov Chain.
     public Slice getMarkovSlice(Random rng) {
-        if (totalFollow > 0) {
-            int r = rng.nextInt(totalFollow);
-            int sum = 0;
+        int r = rng.nextInt(totalFollow);
+        int sum = 0;
 
-            for (Map.Entry<Slice, Integer> e : followTimes.entrySet()) {
-                sum += e.getValue();
-                if (r < sum) {
-                    return e.getKey();
-                }
+        for (Map.Entry<Slice, Integer> e : followTimes.entrySet()) {
+            sum += e.getValue();
+            if (r < sum) {
+                return e.getKey();
             }
         }
         return null;
