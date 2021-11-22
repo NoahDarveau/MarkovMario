@@ -122,16 +122,17 @@ public class LevelGenerator implements MarioLevelGenerator {
         // Adds the starting slice.
         Slice currentSlice = slices.get(starts.get(rand.nextInt(starts.size())));
         addSlice(model, 0, currentSlice);
+        Slice previousSlice;
 
         // Add slices until the end is reached.
         while (x < model.getWidth() - 1) {
             do {
-                Slice previousSlice = currentSlice;
+                previousSlice = currentSlice;
                 prevHeight = previousSlice.getGroundHeight();
                 currentSlice = currentSlice.getMarkovSlice(rand);
 
                 // If currentSlice has proceeding slices, generate another slice.
-                if (currentSlice.getNextSlices() >= 1 && !currentSlice.getFlag()) {
+                if (currentSlice.getNextSlices() >= 1) {
                     currentSlice = currentSlice.getMarkovSlice(rand);
                 }
 
@@ -145,6 +146,11 @@ public class LevelGenerator implements MarioLevelGenerator {
 
             // Set slices until the end of the model is reached.
             for (int i = 0; i < 16; ++i) {
+
+                // Duplicate previous slice if it attempts to place another mario slice or an early flag.
+                if (currentSlice.getMario() || currentSlice.getFlag()) {
+                    currentSlice = previousSlice;
+                }
                 model.setBlock(x,  i, currentSlice.getChar(i));
             }
 
