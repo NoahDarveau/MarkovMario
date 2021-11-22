@@ -116,8 +116,8 @@ public class LevelGenerator implements MarioLevelGenerator {
     public String getGeneratedLevel(MarioLevelModel model, MarioTimer timer) {
         Random rand = new Random();
         model.clearMap();
+        int prevHeight;
         int x = 1;
-        boolean atEnd = false;
 
         // Adds the starting slice.
         Slice currentSlice = slices.get(starts.get(rand.nextInt(starts.size())));
@@ -126,29 +126,33 @@ public class LevelGenerator implements MarioLevelGenerator {
         // Add slices until the end is reached.
         while (x < model.getWidth() - 1) {
             do {
-                if (currentSlice.getNextSlices() >= 1) {
+                Slice previousSlice = currentSlice;
+                prevHeight = previousSlice.getGroundHeight();
+                currentSlice = currentSlice.getMarkovSlice(rand);
+
+                // If currentSlice has proceeding slices, generate another slice.
+                if (currentSlice.getNextSlices() >= 1 && !currentSlice.getFlag()) {
                     currentSlice = currentSlice.getMarkovSlice(rand);
                 }
+
+                // If currentSlice has no proceeding slices, generate another slice using the previousSlice.
                 else {
-                    atEnd = true;
-                    break;
+                    currentSlice = previousSlice.getMarkovSlice(rand);
                 }
-            } while (currentSlice.getNextSlices() < 1);
 
-            addSlice(model, x, currentSlice);
+                // Only generate levels if the ground height works to prevent impossible jumps from being generated.
+               } while (currentSlice.getNextSlices() < 1 && currentSlice.getGroundHeight() < prevHeight + 3);
 
-            if (currentSlice.getFlag()) {
-                atEnd = true;
-                break;
+            // Set slices until the end of the model is reached.
+            for (int i = 0; i < 16; ++i) {
+                model.setBlock(x,  i, currentSlice.getChar(i));
             }
+
             x++;
         }
 
-        // End the level if we didn't automatically generate an end.
-        if (!atEnd) {
-            currentSlice = slices.get(ends.get(rand.nextInt(ends.size())));
-            addSlice(model, model.getWidth() - 1, currentSlice);
-        }
+        currentSlice = slices.get(ends.get(rand.nextInt(ends.size())));
+        addSlice(model, model.getWidth() - 1, currentSlice);
 
         return model.getMap();
     }

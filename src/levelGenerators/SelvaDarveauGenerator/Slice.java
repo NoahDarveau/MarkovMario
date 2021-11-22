@@ -74,4 +74,27 @@ public class Slice {
         }
         return null;
     }
+
+    // Checks if a given block is a solid tile that can be walked on.
+    private boolean isSolid(char c) {
+        return c == 'X' || c == '#' || c == '@' || c == '!' || c == 'B' || c == 'C' ||
+                c == 'Q' || c == '<' || c == '>' || c == '[' || c == ']' || c == '?' ||
+                c == 'S' || c == 'U' || c == 'D' || c == '%' || c == 't' || c == 'T';
+    }
+
+    // Gets the height of the ground of a certain slice.
+    public int getGroundHeight() {
+        int height = -1;
+        for (int i = 15; i >= 0; --i) {
+            if (isSolid(pieces[i])) {
+                height = i;
+            } else {
+                if (height > -1) {
+                    return height;
+                }
+            }
+        }
+
+        return -1;
+    }
 }
