@@ -132,9 +132,10 @@ public class LevelGenerator implements MarioLevelGenerator {
                } while (currentSlice.getNextSlices() < 1 && currentSlice.getGroundHeight() < prevHeight + 4);
 
             // Duplicate previous slice if it attempts to place another mario slice or an early flag.
-            if (currentSlice.getMario() || currentSlice.getFlag()) {
+            if (currentSlice.getMario() || currentSlice.getFlag() || currentSlice.getNextSlices() < 1) {
                 currentSlice = previousSlice;
             }
+
 
             // Place slices.
             //System.out.print(x + ": ");
@@ -200,7 +201,7 @@ public class LevelGenerator implements MarioLevelGenerator {
                 for(char c : enemies) {
                     if (model.getBlock(x, y) == c) {
                         model.setBlock(x, y, '-');
-                        //System.out.println("Deleted enemy at x: " + x + ", y: " + y);
+                        System.out.println("Deleted enemy at x: " + x + ", y: " + y);
                     }
                 }
             }
