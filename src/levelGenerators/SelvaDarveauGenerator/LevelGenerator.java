@@ -137,10 +137,14 @@ public class LevelGenerator implements MarioLevelGenerator {
             }
 
             // Place slices.
+            //System.out.print(x + ": ");
             for (int i = 0; i < 16; ++i) {
                 model.setBlock(x,  i, currentSlice.getChar(i));
+                //System.out.print(model.getBlock(x, i));
             }
             x++;
+
+            //System.out.println();
         }
 
         // Place an ending slice.
@@ -161,13 +165,30 @@ public class LevelGenerator implements MarioLevelGenerator {
     }
 
     private void fixPipes(MarioLevelModel model) {
-        for (int x = 2; x < model.getWidth(); x++) {
+        int pipeCount = 0;
+        boolean pipeFound;
+        for (int x = 1; x < model.getWidth(); x++) {
+            pipeFound = false;
             for (int y = 0; y < model.getHeight(); y++) {
-                if (model.getBlock(x-2, y) != 't' && model.getBlock(x-1, y) == 't' && model.getBlock(x, y) != 't') {
-                    model.setBlock(x, y, 't');
-                } else if (model.getBlock(x-2, y) != 'T' && model.getBlock(x-1, y) == 'T' && model.getBlock(x, y) != 'T') {
-                    model.setBlock(x, y, 'T');
+                if (model.getBlock(x, y) == 'T' || model.getBlock(x, y) == 't') {
+                    pipeFound = true;
                 }
+            }
+            if (pipeFound) {
+                pipeCount++;
+            }
+            else if (pipeCount % 2 != 0) {
+                for (int y = 0; y < model.getHeight(); y++) {
+                    if (model.getBlock(x-1, y) == 't') {
+                        model.setBlock(x, y, 't');
+                        //System.out.println("Set Block at x: " + x + ", y: " + y + " to: t");
+                    }
+                    else if (model.getBlock(x-1, y) == 'T') {
+                        model.setBlock(x, y, 'T');
+                        //System.out.println("Set Block at x: " + x + ", y: " + y + " to: T");
+                    }
+                }
+                pipeCount = 0;
             }
         }
     }
