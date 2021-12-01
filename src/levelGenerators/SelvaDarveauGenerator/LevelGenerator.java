@@ -2,10 +2,8 @@ package levelGenerators.SelvaDarveauGenerator;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import engine.core.MarioLevelGenerator;
 import engine.core.MarioLevelModel;
@@ -141,9 +139,7 @@ public class LevelGenerator implements MarioLevelGenerator {
             // Place slices.
             for (int i = 0; i < 16; ++i) {
                 model.setBlock(x,  i, currentSlice.getChar(i));
-                System.out.print(currentSlice.getChar(i));
             }
-            System.out.println();
             x++;
         }
 
@@ -152,6 +148,7 @@ public class LevelGenerator implements MarioLevelGenerator {
         addSlice(model, model.getWidth() - 1, currentSlice);
 
         fixPipes(model);
+        fixSpawnKills(model);
 
         return model.getMap();
     }
@@ -170,6 +167,20 @@ public class LevelGenerator implements MarioLevelGenerator {
                     model.setBlock(x, y, 't');
                 } else if (model.getBlock(x-2, y) != 'T' && model.getBlock(x-1, y) == 'T' && model.getBlock(x, y) != 'T') {
                     model.setBlock(x, y, 'T');
+                }
+            }
+        }
+    }
+
+    private void fixSpawnKills(MarioLevelModel model) {
+        char[] enemies = MarioLevelModel.getEnemyCharacters();
+        for (int x = 0; x < 15; x++) {
+            for (int y = 0; y < model.getHeight(); y++) {
+                for(char c : enemies) {
+                    if (model.getBlock(x, y) == c) {
+                        model.setBlock(x, y, '-');
+                        //System.out.println("Deleted enemy at x: " + x + ", y: " + y);
+                    }
                 }
             }
         }
