@@ -108,6 +108,7 @@ public class LevelGenerator implements MarioLevelGenerator {
             if (lastSlice != null) {
                 lastSlice.addNextSlice(tempSlice);
             }
+
             lastSlice = tempSlice;
         }
     }
@@ -127,9 +128,12 @@ public class LevelGenerator implements MarioLevelGenerator {
         // Add slices until the end is reached.
         while (x < model.getWidth() - 1) {
             do {
+
                 previousSlice = currentSlice;
                 prevHeight = previousSlice.getGroundHeight();
                 currentSlice = currentSlice.getMarkovSlice(rand);
+
+
                } while (currentSlice.getNextSlices() < 1 && currentSlice.getGroundHeight() < prevHeight + 4);
 
             // Duplicate previous slice if it attempts to place another mario slice or an early flag.
@@ -140,13 +144,17 @@ public class LevelGenerator implements MarioLevelGenerator {
             // Place slices.
             for (int i = 0; i < 16; ++i) {
                 model.setBlock(x,  i, currentSlice.getChar(i));
+                System.out.print(currentSlice.getChar(i));
             }
+            System.out.println();
             x++;
         }
 
         // Place an ending slice.
         currentSlice = slices.get(ends.get(rand.nextInt(ends.size())));
         addSlice(model, model.getWidth() - 1, currentSlice);
+
+        fixPipes(model);
 
         return model.getMap();
     }
@@ -155,6 +163,18 @@ public class LevelGenerator implements MarioLevelGenerator {
     private void addSlice(MarioLevelModel model, int x, Slice currentSlice) {
         for (int i = 0; i < 16; ++i) {
             model.setBlock(x, i, currentSlice.getChar(i));
+        }
+    }
+
+    private void fixPipes(MarioLevelModel model) {
+        for (int x = 2; x < model.getWidth(); x++) {
+            for (int y = 0; y < model.getHeight(); y++) {
+                if (model.getBlock(x-2, y) != 't' && model.getBlock(x-1, y) == 't' && model.getBlock(x, y) != 't') {
+                    model.setBlock(x, y, 't');
+                } else if (model.getBlock(x-2, y) != 'T' && model.getBlock(x-1, y) == 'T' && model.getBlock(x, y) != 'T') {
+                    model.setBlock(x, y, 'T');
+                }
+            }
         }
     }
 

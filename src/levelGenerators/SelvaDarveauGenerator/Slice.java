@@ -36,6 +36,7 @@ public class Slice {
     public boolean getMario() {
         return this.isMario;
     }
+
     public char getChar(int index) { return this.pieces[index]; }
     public int getNextSlices() {
         return totalFollow;
@@ -93,4 +94,7 @@ public class Slice {
 
         return height;
     }
+
+
+
 }
