@@ -85,14 +85,17 @@ public class Slice {
 
     // Gets the height of the ground of a certain slice.
     public int getGroundHeight() {
-        int height = -1;
+        int out = -1;
         for (int i = 15; i >= 0; --i) {
             if (isSolid(pieces[i])) {
-                height = i;
+                out = i;
+            } else {
+                if (out > -1) {
+                    return out;
+                }
             }
         }
-
-        return height;
+        return -1;
     }
 
 

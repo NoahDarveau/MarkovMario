@@ -128,24 +128,42 @@ public class LevelGenerator implements MarioLevelGenerator {
             do {
                 previousSlice = currentSlice;
                 prevHeight = previousSlice.getGroundHeight();
-                currentSlice = currentSlice.getMarkovSlice(rand);
-               } while (currentSlice.getNextSlices() < 1 && currentSlice.getGroundHeight() < prevHeight + 4);
+
+                if (currentSlice.getNextSlices() > 1) {
+                    currentSlice = currentSlice.getMarkovSlice(rand);
+                } else {
+                    currentSlice = previousSlice.getMarkovSlice(rand);
+                }
+
+               } while (currentSlice.getNextSlices() < 1);
 
             // Duplicate previous slice if it attempts to place another mario slice or an early flag.
-            if (currentSlice.getMario() || currentSlice.getFlag() || currentSlice.getNextSlices() < 1) {
+            if (currentSlice.getMario() || currentSlice.getFlag()) {
                 currentSlice = previousSlice;
             }
 
 
             // Place slices.
-            //System.out.print(x + ": ");
             for (int i = 0; i < 16; ++i) {
                 model.setBlock(x,  i, currentSlice.getChar(i));
-                //System.out.print(model.getBlock(x, i));
             }
-            x++;
 
-            //System.out.println();
+            // Place a helper block if there's an impossible jump, but don't obstruct any pipes.
+            if (currentSlice.getGroundHeight() > prevHeight + 5) {
+                boolean isPipe = false;
+
+                for (int i = 0; i < 16; ++i) {
+                    if (model.getBlock(x, i) == 'T' || model.getBlock(x, i) == 't' || model.getBlock(x, i) == '>' || model.getBlock(x, i) == '<') {
+                        isPipe = true;
+                    }
+                }
+                if (!isPipe) {
+                    model.setBlock(x - 1, currentSlice.getGroundHeight() + 4, '#');
+                    System.out.println("Placing helper block at x: " + x);
+                }
+            }
+
+            x++;
         }
 
         // Place an ending slice.
@@ -182,11 +200,9 @@ public class LevelGenerator implements MarioLevelGenerator {
                 for (int y = 0; y < model.getHeight(); y++) {
                     if (model.getBlock(x-1, y) == 't') {
                         model.setBlock(x, y, 't');
-                        //System.out.println("Set Block at x: " + x + ", y: " + y + " to: t");
                     }
                     else if (model.getBlock(x-1, y) == 'T') {
                         model.setBlock(x, y, 'T');
-                        //System.out.println("Set Block at x: " + x + ", y: " + y + " to: T");
                     }
                 }
                 pipeCount = 0;
