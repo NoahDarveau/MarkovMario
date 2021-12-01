@@ -149,7 +149,7 @@ public class LevelGenerator implements MarioLevelGenerator {
             }
 
             // Place a helper block if there's an impossible jump, but don't obstruct any pipes.
-            if (currentSlice.getGroundHeight() > prevHeight + 5) {
+            if (currentSlice.getGroundHeight() > prevHeight + 6) {
                 boolean isPipe = false;
 
                 for (int i = 0; i < 16; ++i) {
@@ -159,7 +159,11 @@ public class LevelGenerator implements MarioLevelGenerator {
                 }
                 if (!isPipe) {
                     model.setBlock(x - 1, currentSlice.getGroundHeight() + 4, '#');
-                    System.out.println("Placing helper block at x: " + x);
+                    System.out.println("Placing helper block at x: " + (x - 1));
+                } else {
+                    // Placing blocks further back to not interfere with pipe generation.
+                    model.setBlock(x - 2, currentSlice.getGroundHeight() + 3, '#');
+                    System.out.println("Placing helper block before a pipe at x: " + (x - 2));
                 }
             }
 
