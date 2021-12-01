@@ -116,13 +116,13 @@ public class LevelGenerator implements MarioLevelGenerator {
     public String getGeneratedLevel(MarioLevelModel model, MarioTimer timer) {
         Random rand = new Random();
         model.clearMap();
+        Slice previousSlice;
         int prevHeight;
         int x = 1;
 
         // Adds the starting slice.
         Slice currentSlice = slices.get(starts.get(rand.nextInt(starts.size())));
         addSlice(model, 0, currentSlice);
-        Slice previousSlice;
 
         // Add slices until the end is reached.
         while (x < model.getWidth() - 1) {
@@ -130,33 +130,21 @@ public class LevelGenerator implements MarioLevelGenerator {
                 previousSlice = currentSlice;
                 prevHeight = previousSlice.getGroundHeight();
                 currentSlice = currentSlice.getMarkovSlice(rand);
+               } while (currentSlice.getNextSlices() < 1 && currentSlice.getGroundHeight() < prevHeight + 4);
 
-                // If currentSlice has proceeding slices, generate another slice.
-                if (currentSlice.getNextSlices() >= 1) {
-                    currentSlice = currentSlice.getMarkovSlice(rand);
-                }
-
-                // If currentSlice has no proceeding slices, generate another slice using the previousSlice.
-                else {
-                    currentSlice = previousSlice.getMarkovSlice(rand);
-                }
-
-                // Only generate levels if the ground height works to prevent impossible jumps from being generated.
-               } while (currentSlice.getNextSlices() < 1 && currentSlice.getGroundHeight() < prevHeight + 3);
-
-            // Set slices until the end of the model is reached.
-            for (int i = 0; i < 16; ++i) {
-
-                // Duplicate previous slice if it attempts to place another mario slice or an early flag.
-                if (currentSlice.getMario() || currentSlice.getFlag()) {
-                    currentSlice = previousSlice;
-                }
-                model.setBlock(x,  i, currentSlice.getChar(i));
+            // Duplicate previous slice if it attempts to place another mario slice or an early flag.
+            if (currentSlice.getMario() || currentSlice.getFlag()) {
+                currentSlice = previousSlice;
             }
 
+            // Place slices.
+            for (int i = 0; i < 16; ++i) {
+                model.setBlock(x,  i, currentSlice.getChar(i));
+            }
             x++;
         }
 
+        // Place an ending slice.
         currentSlice = slices.get(ends.get(rand.nextInt(ends.size())));
         addSlice(model, model.getWidth() - 1, currentSlice);
 
